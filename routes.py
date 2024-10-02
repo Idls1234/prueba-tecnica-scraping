@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import List
 from prueba2 import get_products
 from prueba1 import prueba_1
 from fastapi.responses import FileResponse
