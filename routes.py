@@ -1,24 +1,33 @@
-from fastapi import FastAPI
-from prueba2 import get_products
-from prueba1 import prueba_1
-from fastapi.responses import FileResponse
+from flask import Flask, request, jsonify, send_file
 import os
+import asyncio
+from prueba1 import prueba_1
+from prueba2 import get_products_playwright 
 
-app = FastAPI()
+app = Flask(__name__)
 
-@app.get("/prueba1")
-async def get_articles():
+@app.route('/prueba1', methods=['GET'])
+def get_articles():
+    # Simula la función prueba_1()
+
     if prueba_1():
         file_path = "output_product.csv"
         if os.path.exists(file_path):
-            return FileResponse(path=file_path, filename="output_product.csv", media_type='text/csv')
+            return send_file(file_path, as_attachment=True, download_name="output_product.csv", mimetype='text/csv')
         else:
-            return {"error": "File not found"}
+           return jsonify({"error": "File not found"}), 404
     else:
-        return {"error": "No se encontraron custom_attributes."}
+        return jsonify({"error": "No se encontraron custom_attributes."}), 404
 
-@app.post("/prueba2")
-async def extract_products(url: str):
-    found_products = get_products(url)
-    return {"url": url, 
-            "products": found_products}
+@app.route('/prueba2', methods=['POST'])
+def extract_products():
+    data = request.get_json()
+    url = data.get('url')
+    print("URL: " + url)
+    
+    # Ejecutar la coroutine y obtener el resultado
+    found_products = asyncio.run(get_products_playwright(url))
+    return jsonify({"url": url, "products": found_products})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)

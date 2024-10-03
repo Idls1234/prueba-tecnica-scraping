@@ -1,4 +1,6 @@
 beautifulsoup4
-fastapi
-uvicorn
+lxml
+flask
 requests
+lxml_html_clean
+playwright
